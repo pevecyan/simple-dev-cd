@@ -1,0 +1,24 @@
+{
+  "name": "simple-dev-cd",
+  "version": "1.0.0",
+  "description": "Simple continuous deployment for developers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pevecyan/simple-dev-cd.git"
+  },
+  "author": "Žan Pevec",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pevecyan/simple-dev-cd/issues"
+  },
+  "homepage": "https://github.com/pevecyan/simple-dev-cd#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "colors": "^1.1.2",
+    "express": "^4.16.2"
+  }
+}
