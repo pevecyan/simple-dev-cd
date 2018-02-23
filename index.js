@@ -1,9 +1,10 @@
-let colors = require('colors');
-let express = require('express');
-let bodyParser = require('body-parser');
-let crypto = require('crypto');
-let fs = require('fs');
-let {exec} = require('child_process');
+const colors = require('colors');
+const express = require('express');
+const bodyParser = require('body-parser');
+const crypto = require('crypto');
+const bufferEq = require('buffer-equal-constant-time');
+const fs = require('fs');
+const {exec} = require('child_process');
 
 let config = initConfig();
 if(!config){return}
@@ -21,10 +22,11 @@ app.get('/health', (req,res)=>{
 })
 
 app.post('/',(req,res)=>{
-    let {token, payload} = req.body;
-    payload = JSON.parse(payload);
+    let payload = req.body;
+    let sign = req.headers['x-hub-signature'] || '';
+
     
-    if(token == config.token){
+    if(verifySignature(config.token, JSON.stringify(req.body), sign)){
         res.end();
         console.log('Webhook recevied'.green);
         exec('git pull', {cwd:config.dir}, (err,out,oute)=>{
@@ -70,6 +72,12 @@ function initConfig(){
         return undefined;
     } 
     return config;
-    
+}
 
+function signData(secret, data) {
+	return 'sha1=' + crypto.createHmac('sha1', secret).update(data).digest('hex');
+}
+
+function verifySignature(secret, data, signature) {
+	return bufferEq(new Buffer(signature), new Buffer(signData(secret, data)));
 }
