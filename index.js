@@ -1,6 +1,7 @@
 let colors = require('colors');
 let express = require('express');
 let bodyParser = require('body-parser');
+let crypto = require('crypto');
 let fs = require('fs');
 let {exec} = require('child_process');
 
@@ -20,17 +21,23 @@ app.get('/health', (req,res)=>{
 })
 
 app.post('/',(req,res)=>{
-    let {payload} = req.body;
+    let {token, payload} = req.body;
     payload = JSON.parse(payload);
-    res.end();
-    console.log('Webhook recevied'.green);
-    exec('git pull', {cwd:config.dir}, (err,out,oute)=>{
-        console.log(out.yellow);
-        if(!err)
-            exec(config.deploy, {cwd:config.dir}, (err,out,oute)=>{
-                console.log(out.yellow);
-            })
-    })
+    
+    if(token == config.token){
+        res.end();
+        console.log('Webhook recevied'.green);
+        exec('git pull', {cwd:config.dir}, (err,out,oute)=>{
+            console.log(out.yellow);
+            if(!err)
+                exec(config.deploy, {cwd:config.dir}, (err,out,oute)=>{
+                    console.log(out.yellow);
+                })
+        })
+    }else{
+        res.status(401).end();
+    }
+    
 })
 
 app.get('/',(req,res)=>{
@@ -49,9 +56,10 @@ function initConfig(){
         config = fs.readFileSync('./config.json', {encoding:'utf8'});
     } catch (error) {
         config = JSON.stringify({
-            port:2017,
+            port:12888,
             dir:'./',
-            deploy:'echo deploy'
+            deploy:'echo deploy',
+            token:crypto.randomBytes(64).toString('hex'),
         },null,'\t');
         fs.writeFileSync('./config.json',config, {encoding:'utf8'})
     }
