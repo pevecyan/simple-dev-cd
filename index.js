@@ -28,6 +28,13 @@ app.post('/',(req,res)=>{
     
     if(verifySignature(config.token, JSON.stringify(req.body), sign)){
         res.end();
+	
+	let refArr = req.body.ref.split('/');
+        if (config.branch && config.branch !== refArr[refArr.length-1]) {
+                console.log('Webhook ignored (not for this branch)');
+                return;
+        }
+	
         console.log('Webhook recevied'.green);
         exec('git pull', {cwd:config.dir}, (err,out,oute)=>{
             console.log(out.yellow);
