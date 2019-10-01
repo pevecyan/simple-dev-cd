@@ -1,0 +1,7 @@
+{
+    "port": 12888,
+    "dir": "../working-dir",
+    "deploy": "pm2 restart our-app",
+    "token": "asdkjkaljdlkerw326242340230sdfsdadasdasdqwqw",
+    "branch": "master"
+}
